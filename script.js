@@ -4,7 +4,40 @@ const ctx = canvas.getContext('2d')
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 const fps = 100;
-const blockSize = 30;
+const blockSize = 50;
+const startPosX = 20;
+const startPosY = 20;
+const boundaries = [];
+
+const map = [['1', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '2'],
+             ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+             ['|', '.', '.', '[', '-', '-', ']', '.', '.', '.', '.', '.', '.', '.', '[', ']', '.', '|'],
+             ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '[', ']', '.', '.', '.', '.', '.', '|'],
+             ['|', '.', '.', '.', '.', '.', '.', '.', '^', '.', '.', '.', '.', '.', '[', ']', '.', '|'],
+             ['|', '.', '[', '7', ']', '.', '.', '[', '+', ']', '.', '.', '^', '.', '.', '.', '.', '|'],
+             ['|', '.', '.', '_', '.', '.', '.', '.', '_', '.', '.', '[', '+', ']', '.', '.', '.', '|'],
+             ['|', '.', '.', '.', '.', 'b', '.', '.', '.', '.', '.', '.', '_', '.', '.', '.', '.', '|'],
+             ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+             ['3', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '4']]
+
+const textToImg = {
+    '-' : './images/pipeHorizontal.png',
+    '|' : './images/pipeVertical.png',
+    '1' : './images/pipeCorner1.png',
+    '2' : './images/pipeCorner2.png',
+    '4' : './images/pipeCorner3.png',
+    '3' : './images/pipeCorner4.png',
+    'b' : './images/block.png',
+    '[' : './images/capLeft.png',
+    ']' : './images/capRight.png',
+    '_' : './images/capBottom.png',
+    '^' : './images/capTop.png',
+    '+' : './images/pipeCross.png',
+    '5' : './images/pipeConnectorTop.png',
+    '6' : './images/pipeConnectorRight.png',
+    '7' : './images/pipeConnectorBottom.png',
+    '8' : './images/pipeConnectorLeft.png',
+}
 
 
 class Player{
@@ -45,7 +78,7 @@ class Boundary{
         this.img.src = this.imgURL
     }
     draw(){
-        ctx.drawImage(this.imgURL, this.pos.x, this.pos.y)
+        ctx.drawImage(this.img, this.pos.x, this.pos.y, this.blockSize, this.blockSize)
     }
 }
 const player = new Player({x:10, y:10})
@@ -62,9 +95,25 @@ document.body.addEventListener('keydown', (e) => {
 })
 
 function draw(){
-    ctx.clearRect(0, 0, innerWidth, innerHeight)
+    ctx.fillStyle = '#000000'
+    ctx.fillRect(0, 0, innerWidth, innerHeight)
     player.draw()
     player.move()
+    for(let i = 0; i < boundaries.length; i++){
+        boundaries[i].draw()
+    }
+}
+
+for(let i = 0; i < map.length; i++){
+    for(let j = 0; j < map[i].length; j++){
+        if(map[i][j] != '.'){
+            boundaries.push(new Boundary(
+                {x:startPosX + blockSize * j, y: startPosY + blockSize * i},
+                textToImg[map[i][j]],
+                blockSize
+            ))
+        }
+    }
 }
 
 setInterval(draw, 1000 / fps);
